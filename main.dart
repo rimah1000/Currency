@@ -1,57 +1,85 @@
 import 'package:flutter/material.dart';
 
-void main() => runApp(const MyApp());
+void main() {
+  runApp(CurrencyConverterApp());
+}
 
-// you can type st and then select stless, to create the below class.
-
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
+class CurrencyConverterApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-        home: Scaffold(
-            appBar: AppBar(
-              title: const Text('Home Page'),
-              centerTitle: true,
-              backgroundColor: Colors.blue,
-            ),
-            body: const Column(
-              children: <Widget>[
-                SizedBox(
-                  height: 16.0,
-                ),
-                MyTextWidght(text: 'Text 1'),
-                SizedBox(
-                  height: 16.0,
-                ),
-                MyTextWidght(text: 'Text 2'),
-                SizedBox(
-                  height: 16.0,
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: <Widget>[
-                    MyTextWidght(text: 'Text 3'),
-                    MyTextWidght(text: 'Text 4'),
-                    MyTextWidght(text: 'Text 5')
-                  ],
-                )
-              ],
-            )));
+      debugShowCheckedModeBanner: false,
+      home: CurrencyConverter(),
+    );
   }
 }
 
-class MyTextWidght extends StatelessWidget {
-  final String text;
-  const MyTextWidght({required this.text, super.key});
+class CurrencyConverter extends StatefulWidget {
+  @override
+  _CurrencyConverterState createState() => _CurrencyConverterState();
+}
+
+class _CurrencyConverterState extends State<CurrencyConverter> {
+  final TextEditingController _controller = TextEditingController();
+  String _selectedCurrency = 'LBP';
+  double _convertedAmount = 0;
+
+  final Map<String, double> rates = {
+    'LBP': 90000,
+    '€': 0.90, // Replace with dynamic rates
+    '₱': 56.00, // Replace with dynamic rates
+  };
+
+  void _convertCurrency() {
+    setState(() {
+      double amount = double.tryParse(_controller.text) ?? 0;
+      _convertedAmount = amount * rates[_selectedCurrency]!;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Text(text,
-          style: const TextStyle(
-              fontSize: 50, color: Color.fromARGB(255, 119, 214, 10))),
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Currency Converter'),
+        centerTitle: true,
+        backgroundColor: Colors.yellow,
+        foregroundColor: Colors.black,
+      ),
+      body: Padding(
+        padding: EdgeInsets.all(16.0),
+        child: Column(
+          children: [
+            TextField(
+              controller: _controller,
+              keyboardType: TextInputType.number,
+              decoration: InputDecoration(labelText: 'Enter amount in USD'),
+            ),
+            DropdownButton<String>(
+              value: _selectedCurrency,
+              onChanged: (value) {
+                setState(() {
+                  _selectedCurrency = value!;
+                });
+              },
+              items: rates.keys.map((currency) {
+                return DropdownMenuItem(
+                  value: currency,
+                  child: Text(currency),
+                );
+              }).toList(),
+            ),
+            ElevatedButton(
+              onPressed: _convertCurrency,
+              child: Text('Convert'),
+            ),
+            Text(
+              'Converted Amount: $_convertedAmount $_selectedCurrency',
+              style: TextStyle(fontSize: 20),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
